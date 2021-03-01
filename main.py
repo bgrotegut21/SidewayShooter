@@ -1,9 +1,12 @@
 import pygame
 import sys
+from time import sleep
+
 from settings import Settings
 from ship import Ship   
 from bullet import Bullet
 from alien import Alien
+from game_stats import GameStats
 class Main:
     def __init__(self):
         pygame.init()
@@ -15,6 +18,7 @@ class Main:
         self.ship = Ship(self)
         self.aliens = pygame.sprite.Group()
         self._add_alien()
+        self.stats = GameStats()
 
     def _add_alien(self):
         alien = Alien(self)
@@ -54,15 +58,20 @@ class Main:
             self.ship.up_movement = False
         if keyup.key == pygame.K_DOWN:
             self.ship.down_movement = False
-
+    def _collisions(self):
+        for bullet in self.bullets.copy():
+            if pygame.sprite.spritecollide(bullet,self.aliens,True):
+                self.bullets.remove(bullet)
     def _fire_bullet(self):
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) <= self.settings.bullet_limit:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+            
     
     def _drop_alien(self):
         for alien in self.aliens:
-            alien.y_cord = self.settings.alien_drop_speed
-            alien.rect.y = alien.y_cord
+            alien.x_cord += self.settings.alien_drop_speed
+            alien.rect.x = alien.x_cord
     def _move_aliens(self):
         check_edges = 0
         self.aliens.update()
@@ -73,9 +82,14 @@ class Main:
             if alien.rect.y >= self.screen_rect.height - alien.rect.height:
                 check_edges = -1
         if check_edges != 0:
-            self._drop_alien
+            self._drop_alien()
             self.settings.alien_direction = check_edges
-
+        if len(self.aliens) == 0:
+            self._add_alien()
+        if pygame.sprite.spritecollide(self.ship,self.aliens):
+            self._reset_game()
+        if aliien.rect.bottom <= self.screen_rect.bottom:
+            self._reset_game()
     
     def _update_bullet(self):
         self.bullets.update()
@@ -84,19 +98,35 @@ class Main:
             bullet.update()
             if bullet.rect.x >= self.screen_rect.width:
                 self.bullets.remove(bullet)
+                self.settings.current_bullets = self.settings.bullet_limit
+    def _reset_game(self):
+        if self.stats.ship_left > 0:
+            self.stats.ship_left += -1
+            self.ship.reset_ship()
+            
+            self.aliens.empty()
+            self.bullets.empty()
+        else:
+            self.stats.game_active = False
+    
+    
 
+    
     def _update_game(self):
         self.screen.fill(self.backgroundcolor)
-        self.ship.movement()
         self.ship.blitme()
-        self._update_bullet()
-        self._move_aliens()
         self.aliens.draw(self.screen)
         pygame.display.flip()
     
+
     def run_game(self):
         while True:
             self._check_events()
+            if self.stats.game_active:
+                self.ship.movement()
+                self._update_bullet()
+                self._move_aliens()
+                self._collisions()
             self._update_game()
 
 if __name__ == "__main__":
