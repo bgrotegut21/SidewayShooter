@@ -7,6 +7,8 @@ from ship import Ship
 from bullet import Bullet
 from alien import Alien
 from game_stats import GameStats
+from game_score import Score
+
 class Main:
     def __init__(self):
         pygame.init()
@@ -19,6 +21,7 @@ class Main:
         self.aliens = pygame.sprite.Group()
         self._add_alien()
         self.stats = GameStats()
+        self.score = Score(self)
 
     def _add_alien(self):
         alien = Alien(self)
@@ -61,17 +64,20 @@ class Main:
     def _collisions(self):
         for bullet in self.bullets.copy():
             if pygame.sprite.spritecollide(bullet,self.aliens,True):
-                self.bullets.remove(bullet)
+                self.bullets.empty()
+                self.stats.score += self.settings.points
+                self.score.prep_score()
+            
     def _fire_bullet(self):
         if len(self.bullets) <= self.settings.bullet_limit:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
             
-    
     def _drop_alien(self):
         for alien in self.aliens:
             alien.x_cord += self.settings.alien_drop_speed
             alien.rect.x = alien.x_cord
+
     def _move_aliens(self):
         check_edges = 0
         self.aliens.update()
@@ -81,16 +87,20 @@ class Main:
                 check_edges = 1
             if alien.rect.y >= self.screen_rect.height - alien.rect.height:
                 check_edges = -1
+            if alien.rect.x <= 0:
+                self._reset_game()
         if check_edges != 0:
             self._drop_alien()
             self.settings.alien_direction = check_edges
         if len(self.aliens) == 0:
             self._add_alien()
-        if pygame.sprite.spritecollide(self.ship,self.aliens):
-            self._reset_game()
-        if aliien.rect.bottom <= self.screen_rect.bottom:
-            self._reset_game()
-    
+            self.settings.speed_up() 
+            self.stats.level += 1
+            self.score.prep_levels()
+
+        if pygame.sprite.spritecollide(self.ship,self.aliens,True):
+            self._reset_game()  
+
     def _update_bullet(self):
         self.bullets.update()
         for bullet in self.bullets.copy():
@@ -99,6 +109,7 @@ class Main:
             if bullet.rect.x >= self.screen_rect.width:
                 self.bullets.remove(bullet)
                 self.settings.current_bullets = self.settings.bullet_limit
+
     def _reset_game(self):
         if self.stats.ship_left > 0:
             self.stats.ship_left += -1
@@ -106,25 +117,26 @@ class Main:
             
             self.aliens.empty()
             self.bullets.empty()
+            self.settings.change_dynamic_settings()
+            self.stats.reset_stats()
+
+            sleep(0.5)
         else:
             self.stats.game_active = False
-    
-    
-
     
     def _update_game(self):
         self.screen.fill(self.backgroundcolor)
         self.ship.blitme()
+        self._update_bullet()
         self.aliens.draw(self.screen)
+        self.score.display_stats()
         pygame.display.flip()
     
-
     def run_game(self):
         while True:
             self._check_events()
             if self.stats.game_active:
                 self.ship.movement()
-                self._update_bullet()
                 self._move_aliens()
                 self._collisions()
             self._update_game()
