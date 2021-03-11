@@ -26,6 +26,6 @@ class Settings:
     def speed_up(self):
         self.ship_speed *= self.scale
         self.alien_speed *= self.scale
-        self.points *= self.scale
-        self.alien_drop_speed = int(self.alien_drop_speed) * self.scale
+        self.alien_drop_speed *= self.scale
+        self.points = int(self.points) * int(self.scale)
         self.stats.level += 1

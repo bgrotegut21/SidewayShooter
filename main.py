@@ -22,6 +22,7 @@ class Main:
         self._add_alien()
         self.stats = GameStats()
         self.score = Score(self)
+        self.score.prep_score()
 
     def _add_alien(self):
         alien = Alien(self)
