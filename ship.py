@@ -1,7 +1,8 @@
 import pygame
-
-class Ship:
+from pygame.sprite import Sprite
+class Ship(Sprite):
     def __init__(self,game):
+        super().__init__()
         self.image = pygame.image.load("/Users/braydengrotegut/Documents/python-projects/sideway_shooter/SidewayShooter/images/ship.bmp")
         self.rect = self.image.get_rect()
         self.settings = game.settings

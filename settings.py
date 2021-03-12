@@ -15,11 +15,15 @@ class Settings:
         self.number_columns = 6
         self.scale = 1.5
 
+        self.button_width = 150
+        self.button_height = 50
+        self.button_text_color = (233,233,233)
+
         self.change_dynamic_settings()
 
     def change_dynamic_settings(self):
         self.ship_speed = 10
-        self.alien_speed = 3
+        self.alien_speed = 10
         self.points = 50
         self.alien_drop_speed = -3
 

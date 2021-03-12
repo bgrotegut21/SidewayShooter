@@ -8,6 +8,7 @@ from bullet import Bullet
 from alien import Alien
 from game_stats import GameStats
 from game_score import Score
+from button import Buttons
 
 class Main:
     def __init__(self):
@@ -22,7 +23,7 @@ class Main:
         self._add_alien()
         self.stats = GameStats()
         self.score = Score(self)
-        self.score.prep_score()
+        self.buttons = Buttons(self)
 
     def _add_alien(self):
         alien = Alien(self)
@@ -93,11 +94,14 @@ class Main:
         if check_edges != 0:
             self._drop_alien()
             self.settings.alien_direction = check_edges
-        if len(self.aliens) == 0:
+        if len(self.aliens) == 0 and self.stats.level_up:
             self._add_alien()
             self.settings.speed_up() 
             self.stats.level += 1
             self.score.prep_levels()
+        elif len(self.aliens) == 0:
+            self._add_alien()
+            self.stats.level_up = True
 
         if pygame.sprite.spritecollide(self.ship,self.aliens,True):
             self._reset_game()  
@@ -115,22 +119,26 @@ class Main:
         if self.stats.ship_left > 0:
             self.stats.ship_left += -1
             self.ship.reset_ship()
-            
-            self.aliens.empty()
+            self.score.prep_ships()
+            self.stats.level_up = False
+            self.aliens.empty() 
             self.bullets.empty()
-            self.settings.change_dynamic_settings()
-            self.stats.reset_stats()
-
+            
             sleep(0.5)
         else:
             self.stats.game_active = False
+            self.stats.reset_stats()
+            self.score.prep_score()
+            self.score.prep_levels()
+            
     
     def _update_game(self):
         self.screen.fill(self.backgroundcolor)
         self.ship.blitme()
-        self._update_bullet()
         self.aliens.draw(self.screen)
         self.score.display_stats()
+        if self.stats.game_active:
+            self._update_bullet()
         pygame.display.flip()
     
     def run_game(self):
@@ -140,7 +148,10 @@ class Main:
                 self.ship.movement()
                 self._move_aliens()
                 self._collisions()
+            else:
+                self.buttons.show_button()
             self._update_game()
+
 
 if __name__ == "__main__":
     m = Main()
