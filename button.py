@@ -11,10 +11,8 @@ class Buttons:
         self.hard_button("Hard")
         self.expert_button('Expert')
         self.reset_score("Reset Alltime Score")
-        self.bullet_mode("Bullet Mode - On")
-
-
-
+        self.bullet_mode("Bullet Mode - Off")
+        self.updated_bullet_mode("Bullet Mode - On")
     
     def normal_button(self,msg):
         self.nromal_img = self.font.render(msg,True, self.settings.button_text_color,(0,255,0))
@@ -46,9 +44,19 @@ class Buttons:
         self.bullet_rect.x = self.screen_rect.center[0]
         self.bullet_rect.y = self.screen_rect.center[1] + 100
     
+    def updated_bullet_mode(self,msg):
+        self.updated_bullet_img = self.font.render(msg, True, self.settings.button_text_color, (0,255,0))
+        self.updated_bullet_rect = self.updated_bullet_img.get_rect()
+        self.updated_bullet_rect.x = self.screen_rect.center[0]
+        self.updated_bullet_rect.y = self.screen_rect.center[1] + 100
+    
     def show_button(self):
         self.screen.blit(self.nromal_img,self.normal_rect)
         self.screen.blit(self.hard_img, self.hard_rect)
         self.screen.blit(self.expert_img, self.expert_rect)
         self.screen.blit(self.reset_img, self.reset_rect)
-        self.screen.blit(self.bullet_img, self.bullet_rect)
+        if self.settings.bullet_mode:
+            self.screen.blit(self.updated_bullet_img,self.updated_bullet_rect)
+        else:
+            self.screen.blit(self.bullet_img, self.bullet_rect)
+     

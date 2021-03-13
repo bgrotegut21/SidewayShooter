@@ -4,9 +4,9 @@ class Settings:
         self.backgroundcolor = (233,233,233)
 
         self.bullet_speed = 3
-        self.bullet_width = 1000
+        self.bullet_width = 3
         self.bullet_height = 15
-        self.bullet_limit = 1
+        self.bullet_limit = 3
         self.current_bullets = 0
         self.bullet_color = (0,0,0)
         self.stats = GameStats()
@@ -15,6 +15,7 @@ class Settings:
         self.number_columns = 6
         self.scale = 1.5
 
+        self.bullet_mode = False
         self.button_width = 150
         self.button_height = 50
         self.button_text_color = (233,233,233)
@@ -22,8 +23,8 @@ class Settings:
         self.change_dynamic_settings()
 
     def change_dynamic_settings(self):
-        self.ship_speed = 10
-        self.alien_speed = 10
+        self.ship_speed = 4
+        self.alien_speed = 3
         self.points = 50
         self.alien_drop_speed = -3
 

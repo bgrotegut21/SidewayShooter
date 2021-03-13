@@ -47,7 +47,14 @@ class Main:
                 self._check_keydown(event)
             if event.type == pygame.KEYUP:
                 self._check_keyup(event)
-
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self.check_normal_button(mouse_pos)
+                self.check_hard_button(mouse_pos)
+                self.check_expert_button(mouse_pos)
+                self.check_resetscore_button(mouse_pos)
+                self.check_bulletmode(mouse_pos)
+                
     def _check_keydown(self,keydown):
         if keydown.key == pygame.K_q:
             sys.exit() 
@@ -63,13 +70,51 @@ class Main:
             self.ship.up_movement = False
         if keyup.key == pygame.K_DOWN:
             self.ship.down_movement = False
+
+    def check_normal_button(self,position):
+        collision = self.buttons.normal_rect.collidepoint(position)
+        if collision and self.stats.game_active == False:
+            self.stats.game_active = True
+    
+    def check_hard_button(self,position):
+        collision = self.buttons.hard_rect.collidepoint(position)
+        if collision and self.stats.game_active == False:
+            self.stats.game_active = True
+            self.settings.alien_speed = 6
+            self.settings.alien_drop_speed = -6
+            self.settings.ship_speed = 7
+
+    def check_expert_button(self,position):
+        collision = self.buttons.expert_rect.collidepoint(position)
+        if collision and self.stats.game_active == False:
+            self.stats.game_active = True
+            self.settings.alien_speed = 9
+            self.settings.alien_drop_speed = -9
+            self.settings.ship_speed = 10
+    
+    def check_resetscore_button(self, position):
+        colision = self.buttons.reset_rect.collidepoint(position)
+        if colision and self.stats.game_active == False:
+            pass
+
+    def check_bulletmode(self, position):
+        collision = self.buttons.bullet_rect.collidepoint(position)
+        if collision and self.stats.game_active == False:
+            if self.settings.bullet_mode:
+                self.settings.bullet_mode = False
+                self.buttons.show_button()
+            else:
+                self.settings.bullet_mode = True
+                self.buttons.show_button()
+        
     def _collisions(self):
         for bullet in self.bullets.copy():
             if pygame.sprite.spritecollide(bullet,self.aliens,True):
                 self.bullets.empty()
                 self.stats.score += self.settings.points
+                self.stats.check_highscore()
+                self.score.prep_highscore()
                 self.score.prep_score()
-            
     def _fire_bullet(self):
         if len(self.bullets) <= self.settings.bullet_limit:
             new_bullet = Bullet(self)
@@ -127,30 +172,35 @@ class Main:
             sleep(0.5)
         else:
             self.stats.game_active = False
+            self.aliens.empty()
+            self.bullets.empty()
+            self.ship.reset_ship()
             self.stats.reset_stats()
             self.score.prep_score()
             self.score.prep_levels()
-            
+            self.score.prep_ships()
+            self.buttons.show_button()
+            self.settings.change_dynamic_settings()
     
     def _update_game(self):
         self.screen.fill(self.backgroundcolor)
         self.ship.blitme()
         self.aliens.draw(self.screen)
         self.score.display_stats()
-        if self.stats.game_active:
-            self._update_bullet()
-        pygame.display.flip()
+        self._update_bullet()
     
+
     def run_game(self):
         while True:
             self._check_events()
+            self._update_game()
             if self.stats.game_active:
                 self.ship.movement()
                 self._move_aliens()
                 self._collisions()
-            else:
+            if not self.stats.game_active:
                 self.buttons.show_button()
-            self._update_game()
+            pygame.display.flip()
 
 
 if __name__ == "__main__":

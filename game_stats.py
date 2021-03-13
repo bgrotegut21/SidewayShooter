@@ -8,4 +8,9 @@ class GameStats:
         self.ship_left = 3
         self.level_up = True
         self.score = 0
-        self.level = 0
+        self.level = 0 
+        self.highscore = 0
+
+    def check_highscore(self):
+        if  self.score > self.highscore:
+            self.highscore = self.score
