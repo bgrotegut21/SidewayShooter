@@ -5,7 +5,7 @@ class Alien(Sprite):
     def __init__(self,game):
         super().__init__()
         self.settings = game.settings
-        self.image = pygame.image.load("/Users/braydengrotegut/Documents/python-projects/sideway_shooter/SidewayShooter/images/alien.bmp")
+        self.image = pygame.image.load("images/alien.bmp")
         self.rect = self.image.get_rect()
         self.screen = game.screen
         self.screen_rect = game.screen_rect

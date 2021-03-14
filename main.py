@@ -57,7 +57,7 @@ class Main:
                 
     def _check_keydown(self,keydown):
         if keydown.key == pygame.K_q:
-            sys.exit() 
+            sys.exit()
         if keydown.key == pygame.K_UP:
             self.ship.up_movement = True
         if keydown.key == pygame.K_DOWN:
@@ -113,6 +113,8 @@ class Main:
                 self.bullets.empty()
                 self.stats.score += self.settings.points
                 self.stats.check_highscore()
+                self.stats.check_alltimescore()
+                self.score.prep_alltimescore()
                 self.score.prep_highscore()
                 self.score.prep_score()
     def _fire_bullet(self):

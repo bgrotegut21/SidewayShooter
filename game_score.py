@@ -13,6 +13,7 @@ class Score:
         self.prep_levels()
         self.prep_ships()
         self.prep_highscore()
+        self.prep_alltimescore()
 
     def truncate(self,n, decimals=0):
         multiplier = 10 ** decimals
@@ -31,7 +32,15 @@ class Score:
         score_number = "{:,}".format(int(rounded_score_number))
         self.highscore_text = self.font.render(str(score_number),True,(0,0,0))
         self.highscore_rect = self.highscore_text.get_rect()
-        self.highscore_rect.center = self.screen_rect.center
+        self.highscore_rect.midtop = self.screen_rect.midtop
+
+    def prep_alltimescore(self):
+        rounded_score_number = self.truncate(self.stats.alltimescore, -2)
+        score_number = "{:,}".format(int(rounded_score_number))
+        self.alltimescore_text = self.font.render(str(score_number), True, (0,0,0))
+        self.alltimescore_rect = self.alltimescore_text.get_rect()
+        self.alltimescore_rect.x = self.screen_rect.midtop[0] - 15
+        self.alltimescore_rect.y = self.screen_rect.midtop[1] + 30
 
 
     def prep_levels(self):
@@ -52,5 +61,7 @@ class Score:
     def display_stats(self):
         self.screen.blit(self.score_text,self.score_rect)
         self.screen.blit(self.level_text, self.level_rect)
+        self.screen.blit(self.highscore_text, self.highscore_rect)
+        self.screen.blit(self.alltimescore_text, self.alltimescore_rect)
         self.ships_left.draw(self.screen)
     
