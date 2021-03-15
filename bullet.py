@@ -8,7 +8,6 @@ class Bullet(Sprite):
         self.screen = game.screen
         self.rect = pygame.Rect(0,0,self.settings.bullet_height, self.settings.bullet_width)
         self.ship = game.ship
-        self.rect.center = self.ship.rect.center
         self.x_cord = self.rect.x
 
     def draw_bullet(self):
@@ -16,5 +15,9 @@ class Bullet(Sprite):
 
     def update(self):
         self.x_cord += self.settings.bullet_speed
+        self.rect.x = self.x_cord
+    
+    def update_reverse(self):
+        self.x_cord += self.settings.alien_bullet_speed
         self.rect.x = self.x_cord
         

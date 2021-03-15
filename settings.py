@@ -9,6 +9,7 @@ class Settings:
         self.bullet_limit = 3
         self.current_bullets = 0
         self.bullet_color = (0,0,0)
+        self.alien_bullet_color = (0,255,0)
         self.stats = GameStats()
         
         self.alien_direction = -1
@@ -25,6 +26,7 @@ class Settings:
     def change_dynamic_settings(self):
         self.ship_speed = 3
         self.alien_speed = 2
+        self.alien_bullet_speed = -4
         self.points = 50
         self.alien_drop_speed = -2
 
@@ -33,4 +35,5 @@ class Settings:
         self.alien_speed *= self.scale
         self.alien_drop_speed *= self.scale
         self.points = int(self.points) * int(self.scale)
+        self.alien_bullet_speed *= self.scale
         self.stats.level += 1

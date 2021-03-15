@@ -76,9 +76,19 @@ class Main:
         collision = self.buttons.normal_rect.collidepoint(position)
         if collision and self.stats.game_active == False:
             self.stats.game_active = True
-    def alien_bullets(self):
-        bullet = Bullet(self)
-        
+
+    def create_alien_bullets(self):
+        if len(self.alien_bullets) == 0:
+            bullet = Bullet(self)
+            bullet_space = bullet.rect.height * 10
+            screen_space = self.screen_rect.width//bullet_space
+            for number in range(screen_space):
+                projectile = Bullet(self)
+                projectile.x_cord = self.screen_rect.center[0] 
+                projectile.y_cord =  100 + projectile.rect.width * 10 * number
+                projectile.rect.x = projectile.x_cord
+                projectile.rect.y = projectile.y_cord
+                self.alien_bullets.add(projectile)
     
     def check_hard_button(self,position):
         collision = self.buttons.hard_rect.collidepoint(position)
@@ -123,15 +133,36 @@ class Main:
                 self.score.prep_alltimescore()
                 self.score.prep_highscore()
                 self.score.prep_score()
+    
+    def alien_bullet_collision(self):
+        for bullet in self.alien_bullets.copy():
+            collide = bullet.rect.colliderect(self.ship)
+            if collide:
+                self._reset_game()
+
+
     def _fire_bullet(self):
         if len(self.bullets) <= self.settings.bullet_limit:
             new_bullet = Bullet(self)
+            new_bullet.rect.center = self.ship.rect.center
             self.bullets.add(new_bullet)
             
     def _drop_alien(self):
         for alien in self.aliens:
             alien.x_cord += self.settings.alien_drop_speed
             alien.rect.x = alien.x_cord
+
+    def level_up(self):
+        if len(self.aliens) == 0 and self.stats.level_up:
+            self._add_alien()
+            self.settings.speed_up() 
+            self.stats.level += 1
+            self.score.prep_levels()
+        elif len(self.aliens) == 0:
+            self._add_alien()
+            self.stats.level_up = True
+
+            
 
     def _move_aliens(self):
         check_edges = 0
@@ -144,17 +175,14 @@ class Main:
                 check_edges = -1
             if alien.rect.x <= 0:
                 self._reset_game()
+                
+        self.level_up()
         if check_edges != 0:
+            if self.settings.bullet_mode:
+                self.create_alien_bullets()
             self._drop_alien()
             self.settings.alien_direction = check_edges
-        if len(self.aliens) == 0 and self.stats.level_up:
-            self._add_alien()
-            self.settings.speed_up() 
-            self.stats.level += 1
-            self.score.prep_levels()
-        elif len(self.aliens) == 0:
-            self._add_alien()
-            self.stats.level_up = True
+
 
         if pygame.sprite.spritecollide(self.ship,self.aliens,True):
             self._reset_game()  
@@ -168,6 +196,18 @@ class Main:
                 self.bullets.remove(bullet)
                 self.settings.current_bullets = self.settings.bullet_limit
 
+    
+    def _update_alienbullets(self):
+        self.alien_bullets.update()
+        for bullet in self.alien_bullets.copy():
+            bullet.update_reverse()
+            bullet.draw_bullet()
+            print(self.alien_bullets)
+            if bullet.rect.x <= 0:
+                self.alien_bullets.remove(bullet)
+
+
+
     def _reset_game(self):
         if self.stats.ship_left > 0:
             self.stats.ship_left += -1
@@ -176,7 +216,7 @@ class Main:
             self.stats.level_up = False
             self.aliens.empty() 
             self.bullets.empty()
-            
+            self.alien_bullets.empty()
             sleep(0.5)
         else:
             self.stats.game_active = False
@@ -189,23 +229,31 @@ class Main:
             self.score.prep_ships()
             self.buttons.show_button()
             self.settings.change_dynamic_settings()
+            self.alien_bullets.empty()
     
     def _update_game(self):
         self.screen.fill(self.backgroundcolor)
+
+    def update_objects(self):
         self.ship.blitme()
         self.aliens.draw(self.screen)
         self.score.display_stats()
         self._update_bullet()
+        self._update_alienbullets()
     
+    def update_movement_collision(self):
+        self.ship.movement()
+        self._move_aliens()
+        self._collisions()
+        self.alien_bullet_collision()
 
     def run_game(self):
         while True:
             self._check_events()
             self._update_game()
             if self.stats.game_active:
-                self.ship.movement()
-                self._move_aliens()
-                self._collisions()
+                self.update_objects()
+                self.update_movement_collision()
             if not self.stats.game_active:
                 self.buttons.show_button()
             pygame.display.flip()
