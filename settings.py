@@ -23,10 +23,10 @@ class Settings:
         self.change_dynamic_settings()
 
     def change_dynamic_settings(self):
-        self.ship_speed = 4
-        self.alien_speed = 3
+        self.ship_speed = 3
+        self.alien_speed = 2
         self.points = 50
-        self.alien_drop_speed = -3
+        self.alien_drop_speed = -2
 
     def speed_up(self):
         self.ship_speed *= self.scale

@@ -21,7 +21,7 @@ class GameStats:
 
     def check_alltimescore(self):
         if self.highscore > self.alltimescore:
-            self.alltime_score = self.highscore
+            self.alltimescore = self.highscore
             self.update_alltime_score()
 
     def alltime_score(self):
@@ -33,4 +33,4 @@ class GameStats:
     def update_alltime_score(self):
         filename = "alltimescore.json"
         with open(filename,"w") as score:
-            json.dump(self.alltime_score, score)
+            json.dump(self.alltimescore, score)

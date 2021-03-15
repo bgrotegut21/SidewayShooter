@@ -18,6 +18,7 @@ class Main:
         self.screen = pygame.display.set_mode((1200,600))
         self.screen_rect = self.screen.get_rect()
         self.bullets = pygame.sprite.Group()
+        self.alien_bullets = pygame.sprite.Group()
         self.ship = Ship(self)
         self.aliens = pygame.sprite.Group()
         self._add_alien()
@@ -75,6 +76,9 @@ class Main:
         collision = self.buttons.normal_rect.collidepoint(position)
         if collision and self.stats.game_active == False:
             self.stats.game_active = True
+    def alien_bullets(self):
+        bullet = Bullet(self)
+        
     
     def check_hard_button(self,position):
         collision = self.buttons.hard_rect.collidepoint(position)
@@ -95,7 +99,9 @@ class Main:
     def check_resetscore_button(self, position):
         colision = self.buttons.reset_rect.collidepoint(position)
         if colision and self.stats.game_active == False:
-            pass
+            self.stats.alltimescore = 0
+            self.stats.update_alltime_score()
+            self.score.prep_alltimescore()
 
     def check_bulletmode(self, position):
         collision = self.buttons.bullet_rect.collidepoint(position)

@@ -35,6 +35,7 @@ class Score:
         self.highscore_rect.midtop = self.screen_rect.midtop
 
     def prep_alltimescore(self):
+        print(self.stats.alltimescore)
         rounded_score_number = self.truncate(self.stats.alltimescore, -2)
         score_number = "{:,}".format(int(rounded_score_number))
         self.alltimescore_text = self.font.render(str(score_number), True, (0,0,0))
